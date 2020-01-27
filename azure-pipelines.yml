@@ -38,13 +38,13 @@ steps:
   inputs:
     command: publish
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
-  enabled: false
+  enabled: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
-  enabled: false
+  enabled: true
   condition: succeededOrFailed()
 
 
