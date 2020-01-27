@@ -33,12 +33,13 @@ steps:
     command: test
     projects: '$(System.DefaultWorkingDirectory)/GhandiBot.sln'
 
-- task: DotNetCoreCLI@0
-  displayName: Publish
+- task: DotNetCoreCLI@2
   inputs:
-    command: publish
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'GhandiBot/*.csproj'
     arguments: '--configuration Release --output $(build.artifactstagingdirectory)'
-  enabled: true
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
