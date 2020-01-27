@@ -43,39 +43,6 @@ namespace GhandiBot
                 .Build();
         }
 
-        /*public static void Main(string[] args)
-        {
-            var logger = LogManager.GetCurrentClassLogger();
-            try
-            {
-                var config = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", true, true)
-                    .Build();
-
-                var target = (FileTarget) LogManager.Configuration.FindTargetByName("FileLog");
-                target.FileName = config["LogLocation"];
-                LogManager.ReconfigExistingLoggers();
-
-                var servicesProvider = BuildDi(config);
-                using (servicesProvider as IDisposable)
-                {
-                    var runner = servicesProvider.GetRequiredService<TextManager>();
-                    runner.SendMessage(args[0]);
-                }
-            }
-            catch (Exception ex)
-            {
-                // NLog: catch any exception and log it.
-                logger.Error(ex, "Stopped program because of exception");
-                throw;
-            }
-            finally
-            {
-                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                LogManager.Shutdown();
-            }
-        }*/
-
         public async Task MainAsync()
         {
             var logger = LogManager.GetCurrentClassLogger();
@@ -88,7 +55,7 @@ namespace GhandiBot
             LogManager.ReconfigExistingLoggers();
             
             var services = ConfigureServices(_config);
-            await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
+            await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync(services);
 
             await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
