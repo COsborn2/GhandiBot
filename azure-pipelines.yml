@@ -25,7 +25,7 @@ steps:
   displayName: Build
   inputs:
     projects: '$(System.DefaultWorkingDirectory)/GhandiBot.sln'
-    arguments: '--configuration $(BuildConfiguration)'
+    arguments: '--configuration Release'
 
 - task: DotNetCoreCLI@2
   displayName: Test
@@ -37,7 +37,7 @@ steps:
   displayName: Publish
   inputs:
     command: publish
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration Release --output $(build.artifactstagingdirectory)'
   enabled: true
 
 - task: PublishBuildArtifacts@1
