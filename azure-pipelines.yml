@@ -37,7 +37,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: 'GhandiBot/*.csproj'
+    projects: 'src/GhandiBot/*.csproj'
     arguments: '--configuration Release --output $(build.artifactstagingdirectory)'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
 
