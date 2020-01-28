@@ -40,6 +40,7 @@ namespace GhandiBot
         {
             return new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true, true)
+                .AddEnvironmentVariables()
                 .Build();
         }
 
