@@ -23,6 +23,9 @@
         <None Include="*.config">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Include="..\..\Solution Items\*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
