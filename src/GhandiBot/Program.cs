@@ -1,11 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using GhandiBot.Modules;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NLog;
 using NLog.Extensions.Logging;
 using NLog.Targets;
@@ -20,20 +23,23 @@ namespace GhandiBot
         private DiscordSocketClient _client;
         private IConfiguration _config;
         
-        private IServiceProvider ConfigureServices(IConfiguration config)
+        private IServiceProvider ConfigureServices(IConfiguration config, IServiceCollection services)
         {
-            return new ServiceCollection()
-                .AddSingleton(_client)
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddLogging(loggingBuilder =>
-                {
-                    loggingBuilder.ClearProviders();
-                    loggingBuilder.SetMinimumLevel(LogLevel.Trace);
-                    loggingBuilder.AddNLog(config);
-                })
-                .AddSingleton(_config)
-                .BuildServiceProvider();
+            _config = config;
+
+            services.AddSingleton(_client);
+            services.AddSingleton<CommandService>();
+            services.AddSingleton<CommandHandlingService>();
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+                loggingBuilder.AddNLog(config);
+            });
+            services.AddSingleton(config);
+            services.Configure<AppSettings>(config.GetSection("AppSettings"));
+            
+            return services.BuildServiceProvider();
         }
 
         private IConfiguration BuildConfig()
@@ -46,20 +52,24 @@ namespace GhandiBot
 
         public async Task MainAsync()
         {
-            var logger = LogManager.GetCurrentClassLogger();
-            
             _client = new DiscordSocketClient();
             _config = BuildConfig();
             
             var target = (FileTarget) LogManager.Configuration.FindTargetByName("FileLog");
-            target.FileName = _config["LogLocation"];
-            LogManager.ReconfigExistingLoggers();
             
-            var services = ConfigureServices(_config);
+            var services = ConfigureServices(_config, new ServiceCollection());
             await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync(services);
 
-            var token = _config["token"];
-            logger.Log(NLog.LogLevel.Debug, $"Token: {token}");
+            var settings = services.GetRequiredService<IOptions<AppSettings>>().Value;
+
+            var directory = settings.LogLocation;
+            var logLocation = Path.Combine(directory, DateTime.UtcNow.ToLocalTime()
+                .ToString("MMddyyyy-hh:mm:ss"));
+            target.FileName = logLocation;
+            LogManager.ReconfigExistingLoggers();
+
+            var token = settings.Token;
+            services.GetRequiredService<ILogger<Program>>().LogDebug($"Token: {token}");
 
             await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
