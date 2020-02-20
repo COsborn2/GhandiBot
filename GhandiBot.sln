@@ -8,6 +8,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{047485DB-1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "test\TestProject1\TestProject1.csproj", "{A15161D7-B3C7-4187-B2AD-14F1AD41EA15}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D7CC5FF4-23F9-4D31-961B-A5678E78810E}"
+ProjectSection(SolutionItems) = preProject
+	Solution Items\GhandiBot.conf = Solution Items\GhandiBot.conf
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
