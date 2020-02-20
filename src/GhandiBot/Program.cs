@@ -71,7 +71,7 @@ namespace GhandiBot
             var token = settings.Token;
             services.GetRequiredService<ILogger<Program>>().LogDebug($"Token: {token}");
 
-            await _client.LoginAsync(TokenType.Bot, _config["token"]);
+            await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
             await Task.Delay(-1);
