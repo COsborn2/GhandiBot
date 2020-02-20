@@ -58,6 +58,9 @@ namespace GhandiBot
             var services = ConfigureServices(_config);
             await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync(services);
 
+            var token = _config["token"];
+            logger.Log(NLog.LogLevel.Debug, $"Token: {token}");
+
             await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
 
