@@ -18,7 +18,7 @@ namespace GhandiBot
 {
     class Program
     {
-        public static DateTime StartTime { get; } = DateTime.UtcNow;
+        public static DateTime StartTime { get; private set; }
         
         static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
 
@@ -72,7 +72,12 @@ namespace GhandiBot
             LogManager.ReconfigExistingLoggers();
 
             var token = settings.Token;
-            services.GetRequiredService<ILogger<Program>>().LogDebug($"Token: {token}");
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogDebug($"Token: {token}");
+
+            StartTime = DateTime.UtcNow;
+            
+            logger.LogDebug($"{StartTime}");
 
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
