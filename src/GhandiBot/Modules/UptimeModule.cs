@@ -8,7 +8,6 @@ namespace GhandiBot.Modules
     public class UptimeModule : ModuleBase<SocketCommandContext>
     {
         private readonly ILogger<UptimeModule> _logger;
-        private static DateTime StartTime { get; } = DateTime.UtcNow;
 
         public UptimeModule(ILogger<UptimeModule> logger)
         {
@@ -18,12 +17,12 @@ namespace GhandiBot.Modules
         [Command("uptime")]
         public Task Uptime()
         {
-            var runTime = DateTime.UtcNow - StartTime;
+            var runTime = DateTime.UtcNow - Program.StartTime;
 
             var formattedTimeSpan =
                 $"{runTime.Days} Days, {runTime.Hours} Hours, {runTime.Minutes} Minutes, {runTime.Seconds} Seconds";
             
-            return ReplyAsync($"Started at `{StartTime} UTC`. Running for `{formattedTimeSpan}`");
+            return ReplyAsync($"Started at `{Program.StartTime} UTC`. Running for `{formattedTimeSpan}`");
         }
     }
 }
