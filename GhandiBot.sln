@@ -11,6 +11,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D7CC5FF4-23F9-4D31-961B-A5678E78810E}"
 ProjectSection(SolutionItems) = preProject
 	Solution Items\GhandiBot.conf = Solution Items\GhandiBot.conf
+	Solution Items\GhandiBotStaging.conf = Solution Items\GhandiBotStaging.conf
 EndProjectSection
 EndProject
 Global

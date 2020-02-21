@@ -2,3 +2,4 @@ bin/
 obj/
 /packages/
 GhandiBot/appsettings.development.json
+/**/appsettings.development.json
