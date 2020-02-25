@@ -6,13 +6,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhandiBot", "src\GhandiBot\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{047485DB-13D6-436F-A08A-A272C0F9C74F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "test\TestProject1\TestProject1.csproj", "{A15161D7-B3C7-4187-B2AD-14F1AD41EA15}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D7CC5FF4-23F9-4D31-961B-A5678E78810E}"
 ProjectSection(SolutionItems) = preProject
 	Solution Items\GhandiBot.conf = Solution Items\GhandiBot.conf
 	Solution Items\GhandiBotStaging.conf = Solution Items\GhandiBotStaging.conf
 EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhandiBotTests", "test\GhandiBotTests\GhandiBotTests.csproj", "{54911820-460C-40EC-A4F2-0A38EAC0ADEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,13 +24,13 @@ Global
 		{540514FB-6C2A-47B4-95F4-58E0A8134C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{540514FB-6C2A-47B4-95F4-58E0A8134C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{540514FB-6C2A-47B4-95F4-58E0A8134C4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A15161D7-B3C7-4187-B2AD-14F1AD41EA15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A15161D7-B3C7-4187-B2AD-14F1AD41EA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A15161D7-B3C7-4187-B2AD-14F1AD41EA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A15161D7-B3C7-4187-B2AD-14F1AD41EA15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54911820-460C-40EC-A4F2-0A38EAC0ADEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54911820-460C-40EC-A4F2-0A38EAC0ADEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54911820-460C-40EC-A4F2-0A38EAC0ADEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54911820-460C-40EC-A4F2-0A38EAC0ADEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{540514FB-6C2A-47B4-95F4-58E0A8134C4B} = {72767A9B-F169-4AFC-8788-556BFFB95E07}
-		{A15161D7-B3C7-4187-B2AD-14F1AD41EA15} = {047485DB-13D6-436F-A08A-A272C0F9C74F}
+		{54911820-460C-40EC-A4F2-0A38EAC0ADEC} = {047485DB-13D6-436F-A08A-A272C0F9C74F}
 	EndGlobalSection
 EndGlobal

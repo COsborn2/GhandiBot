@@ -1,10 +1,13 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using GhandiBot;
+using GhandiBot.Mixins;
 using Microsoft.Extensions.Options;
+using Game = GhandiBot.Game;
 
 public class CommandHandlingService
 {
@@ -26,8 +29,17 @@ public class CommandHandlingService
     {
         _Provider = provider;
         _client.MessageReceived += HandleCommandAsync;
-        
+        _client.GuildMemberUpdated += ClientOnGuildMemberUpdated;
+
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), provider);
+    }
+
+    private Task ClientOnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
+    {
+        Game oldActivity = arg1.Activity.GetGame();
+        Game newActivity = arg2.Activity.GetGame();
+
+        return Task.CompletedTask;
     }
 
     private async Task HandleCommandAsync(SocketMessage messageParam)
