@@ -12,7 +12,7 @@ namespace GhandiBot.Mixins
             var allGames = Enum.GetValues(typeof(Game)).Cast<Game>()
                 .Select(game => (game, game.GetAttribute<GameNameAttribute>().GameName));
 
-            var theGame = allGames.SingleOrDefault(x => x.GameName == activity.Name);
+            var theGame = allGames.SingleOrDefault(x => x.GameName == activity?.Name);
 
             return theGame == default ? Game.Unknown : theGame.game;
         }

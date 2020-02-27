@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord.WebSocket;
 using GhandiBot;
 using GhandiBot.Mixins;
@@ -34,17 +36,53 @@ public class CommandHandlingService
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), provider);
     }
 
-    private Task ClientOnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
+    private async Task ClientOnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
     {
-        Game oldActivity = arg1.Activity.GetGame();
-        Game newActivity = arg2.Activity.GetGame();
+        var oldGame = arg1.Activity.GetGame();
+        var newGame = arg2.Activity.GetGame();
 
-        return Task.CompletedTask;
+        // started playing League
+        if (oldGame != Game.LeagueOfLegends && newGame == Game.LeagueOfLegends)
+        {
+            var voiceChannelId = arg1.Guild.VoiceChannels
+                .SingleOrDefault(x => x.Name == "Toxic League Players Only")?.Id;
+            
+            // check to ensure channel doesn't already exist
+            if (voiceChannelId is null)
+            {
+                var categoryId = arg1.Guild.VoiceChannels.First().CategoryId;
+                voiceChannelId = (await arg1.Guild.CreateVoiceChannelAsync("Toxic League Players Only", 
+                    properties => properties.CategoryId = categoryId)).Id;
+            }
+
+            if (arg1.VoiceState.HasValue)
+            {
+                await arg1.ModifyAsync(properties => properties.ChannelId = voiceChannelId.Value);
+                return;
+            }
+        }
+        
+        // stopped playing League
+        if (oldGame == Game.LeagueOfLegends && newGame != Game.LeagueOfLegends)
+        {
+            // Move player to first voice channel
+            await arg1.ModifyAsync(properties => properties.ChannelId = arg1.Guild.VoiceChannels.First().Id);
+
+            var leagueVoiceChannel = arg2.Guild.VoiceChannels
+                .SingleOrDefault(x => x.Name == "Toxic League Players Only");
+            if (!(leagueVoiceChannel is null) && !leagueVoiceChannel.Users.Any())
+            {
+                await arg1.Guild
+                    .GetVoiceChannel(arg1.Guild.VoiceChannels.First(x => 
+                        x.Name == "Toxic League Players Only").Id)
+                    .DeleteAsync();
+            }
+        }
     }
 
     private async Task HandleCommandAsync(SocketMessage messageParam)
     {
-        var message = messageParam as SocketUserMessage;
+        var message = (SocketUserMessage) messageParam;
         if (message == null) return;
 
         int argPos = 0;

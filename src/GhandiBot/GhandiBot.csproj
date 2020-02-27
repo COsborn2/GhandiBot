@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Discord.Net" Version="2.1.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.1" />
@@ -27,6 +26,13 @@
         <None Include="..\..\Solution Items\*">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\lib\Discord.Net.Commands\Discord.Net.Commands.csproj" />
+      <ProjectReference Include="..\..\lib\Discord.Net.Core\Discord.Net.Core.csproj" />
+      <ProjectReference Include="..\..\lib\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+      <ProjectReference Include="..\..\lib\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
     </ItemGroup>
 
 </Project>
