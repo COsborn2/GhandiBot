@@ -3,3 +3,4 @@ obj/
 /packages/
 GhandiBot/appsettings.development.json
 /**/appsettings.development.json
+/**/appsettings.connection.development.json

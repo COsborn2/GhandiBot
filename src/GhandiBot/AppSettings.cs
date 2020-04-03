@@ -5,5 +5,6 @@ namespace GhandiBot
         public string Token { get; set; }
         public string LogLocation { get; set; }
         public char Prefix { get; set; }
+        public string OmdbApiKey { get; set; }
     }
 }
