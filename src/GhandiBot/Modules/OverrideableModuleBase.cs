@@ -1,13 +1,11 @@
-using System;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Microsoft.Extensions.Logging;
 
 namespace GhandiBot.Modules
 {
-    public class OverrideableModuleBase<T> : ModuleBase<T> where T : class, ICommandContext
-    { 
+    public abstract class OverrideableModuleBase<T> : ModuleBase<T> where T : class, ICommandContext
+    {
         private ModuleBase<T> theBase { get; }
 
         public OverrideableModuleBase(ModuleBase<T> moduleBase = null)

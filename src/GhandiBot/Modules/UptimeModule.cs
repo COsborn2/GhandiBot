@@ -13,9 +13,9 @@ namespace GhandiBot.Modules
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
+        
         [Command("uptime")]
-        public Task Uptime()
+        public Task Command()
         {
             var runTime = DateTime.UtcNow - Program.StartTime;
 
