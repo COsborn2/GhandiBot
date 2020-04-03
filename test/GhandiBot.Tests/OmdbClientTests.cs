@@ -23,7 +23,7 @@ namespace ModuleTests
             _clientFactory.RegisterHttpClient("omdb", httpClient);
             _appSettings = Options.Create(new AppSettings
             {
-                OdmbApiKey = "someKey"
+                OmdbApiKey = "someKey"
             });
         }
 

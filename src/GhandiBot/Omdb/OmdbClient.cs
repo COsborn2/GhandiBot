@@ -20,7 +20,7 @@ namespace GhandiBot.Omdb
             if (appSettings == null) throw new ArgumentNullException(nameof(appSettings));
 
             _httpClient = httpClientFactory.CreateClient("omdb");
-            _apiKey = appSettings.Value.OdmbApiKey;
+            _apiKey = appSettings.Value.OmdbApiKey;
         }
 
         public async Task<ApiResponse<Movie>> GetMovieData(string movieName, int year = 0)
