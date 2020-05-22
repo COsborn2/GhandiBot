@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord.WebSocket;
 using GhandiBot.Data;
 using GhandiBot.Data.Services;
@@ -29,12 +30,12 @@ namespace GhandiBot
     class Program
     {
         public static DateTime StartTime { get; private set; }
-        
+
         static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
 
         private DiscordSocketClient _client;
         private IConfiguration _config;
-        
+
         private IConfiguration BuildConfig()
         {
             return new ConfigurationBuilder()
@@ -45,7 +46,7 @@ namespace GhandiBot
                 .AddEnvironmentVariables()
                 .Build();
         }
-        
+
         private IServiceProvider ConfigureServices(IConfiguration config, IServiceCollection services)
         {
             _config = config;
@@ -76,11 +77,18 @@ namespace GhandiBot
             {
                 c.BaseAddress = new Uri("http://www.omdbapi.com/");
             });
-            
+
             // Register Modules for GuildMemberUpdated event
             var types = Assembly.GetEntryAssembly().GetTypes()
                 .Where(x => x.IsSubclassOf(typeof(GuildMemberUpdatedBase)));
             foreach (var type in types)
+            {
+                services.AddSingleton(type);
+            }
+
+            var actions = Assembly.GetEntryAssembly().GetTypes()
+                .Where(x => x.IsSubclassOf(typeof(DiscordModuleBase)));
+            foreach (var type in actions)
             {
                 services.AddSingleton(type);
             }
@@ -108,7 +116,7 @@ namespace GhandiBot
                 },
                 EscapeForwardSlash = true
             };
-            
+
             if (env.IsDevelopment())
             {
                 var consoleTarget = new ConsoleTarget
@@ -117,7 +125,7 @@ namespace GhandiBot
                     Layout = jsonLayout
                 };
                 LogManager.Configuration.AddTarget(consoleTarget);
-                LogManager.Configuration.AddRule(NLog.LogLevel.Trace, 
+                LogManager.Configuration.AddRule(NLog.LogLevel.Trace,
                     NLog.LogLevel.Error,
                     consoleTarget);
             }
@@ -145,13 +153,13 @@ namespace GhandiBot
                         new DatabaseParameterInfo("@logger", "${logger}")
                     }
                 };
-                
+
                 LogManager.Configuration.AddTarget(databaseTarget);
-                LogManager.Configuration.AddRule(NLog.LogLevel.Warn, 
-                    NLog.LogLevel.Error, 
+                LogManager.Configuration.AddRule(NLog.LogLevel.Warn,
+                    NLog.LogLevel.Error,
                     databaseTarget);
             }
-            
+
             var fileTarget = new FileTarget
             {
                 Name = "FileLogging",
@@ -167,7 +175,7 @@ namespace GhandiBot
             };
             LogManager.Configuration.AddTarget(fileTarget);
             LogManager.Configuration.AddRule(NLog.LogLevel.Debug, NLog.LogLevel.Error, fileTarget);
-            
+
             LogManager.ReconfigExistingLoggers();
         }
 
@@ -181,10 +189,13 @@ namespace GhandiBot
                 .GetRequiredService<CommandHandlingService>()
                 .InstallCommandsAsync(services);
 
+            // Initialize Database
+            services.GetRequiredService<AppDbContext>().Initialize();
+
             var settings = services.GetRequiredService<IOptions<AppSettings>>().Value;
-            
+
             var logLocation = settings.LogLocation;
-            ConfigureNLog(services.GetRequiredService<HostingEnvironment>(), logLocation, 
+            ConfigureNLog(services.GetRequiredService<HostingEnvironment>(), logLocation,
                 _config.GetConnectionString("DefaultConnection"));
 
             var token = settings.Token;
@@ -192,7 +203,7 @@ namespace GhandiBot
             logger.LogDebug($"Token: {token}");
 
             StartTime = DateTime.UtcNow;
-            
+
             logger.LogDebug($"{StartTime}");
 
             await _client.LoginAsync(TokenType.Bot, token);

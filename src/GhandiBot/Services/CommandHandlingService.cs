@@ -2,10 +2,13 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord.WebSocket;
 using GhandiBot.Modules;
 using GhandiBot.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace GhandiBot.Services
@@ -27,12 +30,13 @@ namespace GhandiBot.Services
             _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
             _client = client;
         }
-    
+
         public async Task InstallCommandsAsync(IServiceProvider provider)
         {
             _Provider = provider;
             _client.MessageReceived += HandleCommandAsync;
 
+            // TODO: Update this to use new base -- DiscordModuleBase
             // Register GuildMemberUpdated
             var types = Assembly.GetEntryAssembly().GetTypes()
                 .Where(x => x.IsSubclassOf(typeof(GuildMemberUpdatedBase)))
@@ -40,6 +44,16 @@ namespace GhandiBot.Services
             foreach (var type in types)
             {
                 _client.GuildMemberUpdated += ((GuildMemberUpdatedBase) type.Item2).Execute;
+            }
+
+            // Register all actions
+            var actions = Assembly.GetEntryAssembly().GetTypes()
+                .Where(x => x.IsSubclassOf(typeof(DiscordModuleBase)))
+                .Select(x => (x, (DiscordModuleBase) _Provider.GetRequiredService(x)));
+            foreach (var type in actions)
+            {
+                _client.ReactionAdded += type.Item2.ReactionAdded;
+                _client.ReactionRemoved += type.Item2.ReactionRemoved;
             }
 
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), provider);
@@ -52,15 +66,15 @@ namespace GhandiBot.Services
 
             int argPos = 0;
 
-            if (!(message.HasCharPrefix(_settings.Prefix, ref argPos) || 
+            if (!(message.HasCharPrefix(_settings.Prefix, ref argPos) ||
                   message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
                 return;
 
             var context = new SocketCommandContext(_client, message);
-        
+
             var result = await Commands.ExecuteAsync(
-                context, 
+                context,
                 argPos,
                 _Provider);
 

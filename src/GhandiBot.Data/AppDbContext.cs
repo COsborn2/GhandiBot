@@ -14,6 +14,11 @@ namespace GhandiBot.Data
         public DbSet<Logs> Logs { get; set; }
         public DbSet<FeatureOverride> FeatureOverride { get; set; }
 
+        public void Initialize()
+        {
+            Database.Migrate();
+        }
+
         public override int SaveChanges()
         {
             GetCreatedAtAndUpdatedAt();
@@ -26,7 +31,7 @@ namespace GhandiBot.Data
             return base.SaveChanges();
         }
 
-        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, 
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
             CancellationToken cancellationToken = new CancellationToken())
         {
             GetCreatedAtAndUpdatedAt();

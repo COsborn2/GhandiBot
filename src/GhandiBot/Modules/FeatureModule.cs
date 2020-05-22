@@ -26,10 +26,10 @@ namespace GhandiBot.Modules
             IServiceProvider provider, FeatureOverrideService featureOverrideService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _commandHandlingService = commandHandlingService 
+            _commandHandlingService = commandHandlingService
                                       ?? throw new ArgumentNullException(nameof(commandHandlingService));
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            _featureOverrideService = featureOverrideService 
+            _featureOverrideService = featureOverrideService
                                       ?? throw new ArgumentNullException(nameof(featureOverrideService));
 
             GuildMemberUpdatedBaseTypes = Assembly.GetEntryAssembly().GetTypes()
@@ -50,7 +50,7 @@ namespace GhandiBot.Modules
         [Summary("View commands that are enabled/disabled or enable/disable commands")]
         public async Task Command(
             [Summary("(enable|disable|status|list)")]
-            string option, 
+            string option,
             [Summary("name of the feature to be enabled/disabled. See list to see names of features")]
             string feature = "")
         {
@@ -59,7 +59,7 @@ namespace GhandiBot.Modules
                 await ReplyAsync($"Feature '{feature}' cannot be disabled");
                 return;
             }
-            
+
             switch (option)
             {
                 case "enable":
@@ -98,13 +98,12 @@ namespace GhandiBot.Modules
                         x => x.GetType() == typeof(AllowOverrideAttribute)) != null;
                 features.Add((command.Name, overrideAllowed));
             }
-            
+
             // Guild Member Updated Commands
             foreach (var baseType in GuildMemberUpdatedBaseTypes)
             {
                 var val = (baseType.Key.GetType().Name, baseType.Value.IsOverrideable);
                 features.Add(val);
-                
             }
 
             string featuresNewlineSep = "";
