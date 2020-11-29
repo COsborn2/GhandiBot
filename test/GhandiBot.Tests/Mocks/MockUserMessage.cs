@@ -13,7 +13,7 @@ namespace ModuleTests.Mocks
             IsTTS = isTTS;
             Embeds = new List<IEmbed>{ embed };
         }
-        
+
         public ulong Id { get; }
         public DateTimeOffset CreatedAt { get; }
         public Task DeleteAsync(RequestOptions options = null)
@@ -26,6 +26,7 @@ namespace ModuleTests.Mocks
         public bool IsTTS { get; }
         public bool IsPinned { get; }
         public bool IsSuppressed { get; }
+        public bool MentionedEveryone { get; }
         public string Content { get; }
         public DateTimeOffset Timestamp { get; }
         public DateTimeOffset? EditedTimestamp { get; }
@@ -61,6 +62,11 @@ namespace ModuleTests.Mocks
             throw new NotImplementedException();
         }
 
+        public Task CrosspostAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -81,6 +87,11 @@ namespace ModuleTests.Mocks
             throw new NotImplementedException();
         }
 
+        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -91,6 +102,8 @@ namespace ModuleTests.Mocks
         {
             throw new NotImplementedException();
         }
+
+        public IUserMessage ReferencedMessage { get; }
 
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
     }

@@ -11,6 +11,7 @@ using GhandiBot.Modules;
 using GhandiBot.Omdb;
 using GhandiBot.Services;
 using GhandiBot.Utilities;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,12 +30,13 @@ namespace GhandiBot
     class Program
     {
         public static DateTime StartTime { get; private set; }
-        
-        static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
+
+        public static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
         private DiscordSocketClient _client;
         private IConfiguration _config;
-        
+        private HostingEnvironment _environment;
+
         private IConfiguration BuildConfig()
         {
             return new ConfigurationBuilder()
@@ -45,7 +47,7 @@ namespace GhandiBot
                 .AddEnvironmentVariables()
                 .Build();
         }
-        
+
         private IServiceProvider ConfigureServices(IConfiguration config, IServiceCollection services)
         {
             _config = config;
@@ -54,6 +56,8 @@ namespace GhandiBot
             services.AddSingleton<CommandService>();
             services.AddSingleton<CommandHandlingService>();
             services.AddSingleton<HostingEnvironment>();
+            _environment = services.BuildServiceProvider().GetRequiredService<HostingEnvironment>();
+
             services.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.ClearProviders();
@@ -65,10 +69,23 @@ namespace GhandiBot
 
             services.AddSingleton<OmdbClient>();
 
-            var connectionSection = config.GetSection("ConnectionStrings");
-            var connection = connectionSection.GetValue<string>("DefaultConnection");
-            services.AddDbContextPool<AppDbContext>(options => options
-                .UseMySql(connection));
+            if (_environment.IsProduction())
+            {
+                const string connectionName = "DefaultConnection";
+                var connectionString = config.GetConnectionString(connectionName);
+
+                services.AddDbContextPool<AppDbContext>(options =>
+                    options.UseMySql(connectionString));
+            }
+            else
+            {
+                var sqliteConnection = new SqliteConnection("DataSource=:memory:");
+                sqliteConnection.Open();
+                services.AddDbContext<AppDbContext>(options =>
+                {
+                    options.UseSqlite(sqliteConnection);
+                });
+            }
 
             services.AddSingleton<FeatureOverrideService>();
 
@@ -76,7 +93,7 @@ namespace GhandiBot
             {
                 c.BaseAddress = new Uri("http://www.omdbapi.com/");
             });
-            
+
             // Register Modules for GuildMemberUpdated event
             var types = Assembly.GetEntryAssembly().GetTypes()
                 .Where(x => x.IsSubclassOf(typeof(GuildMemberUpdatedBase)));
@@ -108,7 +125,7 @@ namespace GhandiBot
                 },
                 EscapeForwardSlash = true
             };
-            
+
             if (env.IsDevelopment())
             {
                 var consoleTarget = new ConsoleTarget
@@ -117,7 +134,7 @@ namespace GhandiBot
                     Layout = jsonLayout
                 };
                 LogManager.Configuration.AddTarget(consoleTarget);
-                LogManager.Configuration.AddRule(NLog.LogLevel.Trace, 
+                LogManager.Configuration.AddRule(NLog.LogLevel.Trace,
                     NLog.LogLevel.Error,
                     consoleTarget);
             }
@@ -145,13 +162,13 @@ namespace GhandiBot
                         new DatabaseParameterInfo("@logger", "${logger}")
                     }
                 };
-                
+
                 LogManager.Configuration.AddTarget(databaseTarget);
-                LogManager.Configuration.AddRule(NLog.LogLevel.Warn, 
-                    NLog.LogLevel.Error, 
+                LogManager.Configuration.AddRule(NLog.LogLevel.Warn,
+                    NLog.LogLevel.Error,
                     databaseTarget);
             }
-            
+
             var fileTarget = new FileTarget
             {
                 Name = "FileLogging",
@@ -167,11 +184,11 @@ namespace GhandiBot
             };
             LogManager.Configuration.AddTarget(fileTarget);
             LogManager.Configuration.AddRule(NLog.LogLevel.Debug, NLog.LogLevel.Error, fileTarget);
-            
+
             LogManager.ReconfigExistingLoggers();
         }
 
-        public async Task MainAsync()
+        private async Task MainAsync()
         {
             _client = new DiscordSocketClient();
             _config = BuildConfig();
@@ -181,10 +198,12 @@ namespace GhandiBot
                 .GetRequiredService<CommandHandlingService>()
                 .InstallCommandsAsync(services);
 
+            services.GetRequiredService<AppDbContext>().Initialize();
+
             var settings = services.GetRequiredService<IOptions<AppSettings>>().Value;
-            
+
             var logLocation = settings.LogLocation;
-            ConfigureNLog(services.GetRequiredService<HostingEnvironment>(), logLocation, 
+            ConfigureNLog(services.GetRequiredService<HostingEnvironment>(), logLocation,
                 _config.GetConnectionString("DefaultConnection"));
 
             var token = settings.Token;
@@ -192,7 +211,7 @@ namespace GhandiBot
             logger.LogDebug($"Token: {token}");
 
             StartTime = DateTime.UtcNow;
-            
+
             logger.LogDebug($"{StartTime}");
 
             await _client.LoginAsync(TokenType.Bot, token);
